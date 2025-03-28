@@ -1,7 +1,12 @@
 import Accounts from "../../models/accounts.ts";
+import logger from "../../utils/logger.ts";
 
 export const queries = {
   listAccounts: async (_: any, { filter, pagination }: { filter?: { name?: string; email?: string }, pagination?: { page?: number; limit?: number } }) => {
+    
+    logger.info( "listAccounts filter", filter);
+    logger.info( "listAccounts pagination", pagination);
+
     const pipeline: any[] = [];
 
     if (filter) {
@@ -29,7 +34,17 @@ export const queries = {
       $project: { _id: 0, id: 1, name: 1, email: 1, createdAt: 1, updatedAt: 1 }
     });
 
-    const accounts = await Accounts.aggregate(pipeline);
+    let accounts
+
+    try {
+      accounts = await Accounts.aggregate(pipeline);
+    } catch (error) {
+      logger.error( "Error al buscar las cuentas", error);
+      throw new Error("Error al buscar las cuentas");
+    }
+
+    logger.info( "listAccounts accounts", accounts);
+
     return accounts;
   },
 };

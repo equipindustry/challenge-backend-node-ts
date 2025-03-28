@@ -1,21 +1,39 @@
-import Products from '../../models/products.ts';
+import Products from "../../models/products.ts";
+import { AddProductsToAccountSchema } from "../../validators/product.ts";
+import logger from '../../utils/logger.ts';
 
 export const mutations = {
   addProductsToAccount: async (
     _: any,
-    { accountId, products }: { accountId: string; products: Array<{ name: string; sku: string }> }
+    {
+      accountId,
+      products,
+    }: { accountId: string; products: Array<{ name: string; sku: string }> }
   ) => {
+    const input = { accountId, products };
+    logger.info( "addProductsToAccount input", input);
+    const parsed = AddProductsToAccountSchema.safeParse(input);
+
+    if (!parsed.success) {
+      throw new Error("Invalid product input");
+    }
+
+    let createdProducts;
+
     try {
-      // Asigna el accountId a cada producto antes de insertarlo
-      const productsToInsert = products.map(product => ({
+      const productsToInsert = products.map((product) => ({
         ...product,
         accountId,
       }));
 
-      const createdProducts = await Products.insertMany(productsToInsert);
-      return createdProducts;
+      createdProducts = await Products.insertMany(productsToInsert);
     } catch (error: any) {
-      throw new Error("Error al agregar productos: " + error.message);
+      logger.error(error);
+      throw new Error("Error al agregar los productos");
     }
+
+    logger.info( "addProductsToAccount createdProducts", createdProducts);
+
+    return createdProducts;
   },
 };

@@ -1,4 +1,5 @@
 import Products from "../../models/products.ts";
+import logger from "../../utils/logger.ts";
 
 export const queries = {
   listProducts: async (
@@ -11,6 +12,10 @@ export const queries = {
       pagination?: { page?: number; limit?: number };
     }
   ) => {
+
+    logger.info( "listProducts filter", filter);
+    logger.info( "listProducts pagination", pagination);
+
     const pipeline: any[] = [];
 
     if (filter) {
@@ -61,7 +66,17 @@ export const queries = {
       },
     });
 
-    const products = await Products.aggregate(pipeline);
+    let products;
+
+    try {
+      products = await Products.aggregate(pipeline);
+    } catch (error) {
+      logger.error( "Error al buscar los productos", error);
+      throw new Error("Error al buscar los productos");
+    }
+
+    logger.info( "listProducts products", products);
+
     return products;
   },
 };
