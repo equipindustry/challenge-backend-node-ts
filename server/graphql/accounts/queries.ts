@@ -4,8 +4,8 @@ import logger from "../../utils/logger.ts";
 export const queries = {
   listAccounts: async (_: any, { filter, pagination }: { filter?: { name?: string; email?: string }, pagination?: { page?: number; limit?: number } }) => {
     
-    logger.info( "listAccounts filter", filter);
-    logger.info( "listAccounts pagination", pagination);
+    logger.info("listAccounts filter", filter);
+    logger.info("listAccounts pagination", pagination);
 
     const pipeline: any[] = [];
 
@@ -25,7 +25,6 @@ export const queries = {
     pipeline.push({ $skip: (page - 1) * limit });
     pipeline.push({ $limit: limit });
 
-
     pipeline.push({
       $addFields: { id: "$_id" }
     });
@@ -34,16 +33,16 @@ export const queries = {
       $project: { _id: 0, id: 1, name: 1, email: 1, createdAt: 1, updatedAt: 1 }
     });
 
-    let accounts
+    let accounts;
 
     try {
       accounts = await Accounts.aggregate(pipeline);
     } catch (error) {
-      logger.error( "Error al buscar las cuentas", error);
+      logger.error("Error al buscar las cuentas", error);
       throw new Error("Error al buscar las cuentas");
     }
 
-    logger.info( "listAccounts accounts", accounts);
+    logger.info("listAccounts accounts", accounts);
 
     return accounts;
   },
