@@ -1,8 +1,8 @@
 import { Schema } from "mongoose";
 
-import { IAccount } from "../interfaces/account";
+import { IAccount } from "../interfaces/account.ts";
 
-import { cnxAccounts } from "../db/mongodb";
+import { cnxAccounts } from "../db/mongodb.ts";
 
 const accountsSchema = new Schema<IAccount>(
   {

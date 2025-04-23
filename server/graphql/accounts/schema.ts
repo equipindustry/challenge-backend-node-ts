@@ -1,11 +1,45 @@
 import { gql } from "apollo-server-express";
 
 export const schema = gql`
-  extend type Query {
-    testAccQ: Int
+  input CreateAccountInput {
+    name: String!
+    email: String!
+  }
+
+  type Account {
+    id: ID!
+    name: String
+    email: String
+    createdAt: String
+    updatedAt: String
+  }
+
+  type Product {
+    id: ID!
+    name: String!
+    price: Float!
+    createdAt: String
+    updatedAt: String
+  }
+
+  input AccountsFilterInput {
+    name: String
+    email: String
+  }
+
+  input PaginationInput {
+    page: Int
+    limit: Int
   }
 
   extend type Mutation {
-    testAccM: Boolean
+    createAccount(input: CreateAccountInput!): Account
+  }
+
+  extend type Query {
+    listAccounts(
+      filter: AccountsFilterInput
+      pagination: PaginationInput
+    ): [Account]
   }
 `;
